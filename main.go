@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 type Page struct {
@@ -39,5 +40,5 @@ func homeUrlHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	http.HandleFunc("/", homeUrlHandler)
 	http.HandleFunc("/view/", viewHandler)
-	log.Fatal(http.ListenAndServe(":7071", nil))
+	log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), nil))
 }
