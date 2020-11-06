@@ -32,7 +32,12 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", p.Title, p.Body)
 }
 
+func homeUrlHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Hello", "Welcome")
+}
+
 func main() {
+	http.HandleFunc("/", homeUrlHandler)
 	http.HandleFunc("/view/", viewHandler)
 	log.Fatal(http.ListenAndServe(":7071", nil))
 }
