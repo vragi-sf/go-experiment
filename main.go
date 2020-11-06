@@ -34,7 +34,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeUrlHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Hello", "Welcome")
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Hello", "Aloha")
 }
 
 func main() {
