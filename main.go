@@ -13,6 +13,12 @@ type Page struct {
 	Body  []byte
 }
 
+type Message struct {
+	Msg string
+}
+
+var msg Message
+
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
@@ -37,8 +43,19 @@ func homeUrlHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Hello", "Aloha")
 }
 
+func setMessage(w http.ResponseWriter, r *http.Request) {
+	msg = Message{Msg: r.URL.Query()["message"][0]}
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Allo Good", "Message Set")
+}
+
+func fetchMessage(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Hello", msg.Msg)
+}
+
 func main() {
 	http.HandleFunc("/", homeUrlHandler)
 	http.HandleFunc("/view/", viewHandler)
+	http.HandleFunc("/fetch", fetchMessage)
+	http.HandleFunc("/set", setMessage)
 	log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), nil))
 }
