@@ -1,9 +1,9 @@
 package main
 
 import (
+	"salesforce.com/ohana/wiki/model"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 )
@@ -12,12 +12,6 @@ type Page struct {
 	Title string
 	Body  []byte
 }
-
-type Message struct {
-	Msg string
-}
-
-var msg Message
 
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
@@ -44,12 +38,22 @@ func homeUrlHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func setMessage(w http.ResponseWriter, r *http.Request) {
-	msg = Message{Msg: r.URL.Query()["message"][0]}
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Allo Good", "Message Set")
+	var url = "http://"+os.Getenv("SERVICE_ID")+"/receive?message="+r.URL.Query()["message"][0]
+	response, _ := http.Get(url)
+	if response.Status ==  "200 OK" {
+		fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "All Good", "Message Set")
+	} else {
+		fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Not Good", "Message could not be Set")
+	}
+}
+
+func receiveMessage(w http.ResponseWriter, r *http.Request) {
+	var msg = model.Message{Msg: r.URL.Query()["message"][0]}
+	model.AddMessage(msg)
 }
 
 func fetchMessage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Hello", msg.Msg)
+	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "Hello", model.GetMessage().Msg)
 }
 
 func main() {
@@ -57,5 +61,6 @@ func main() {
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/fetch", fetchMessage)
 	http.HandleFunc("/set", setMessage)
-	log.Fatal(http.ListenAndServe(":" + os.Getenv("PORT"), nil))
+	http.HandleFunc("/receive", receiveMessage)
+	http.ListenAndServe(":" + os.Getenv("PORT"), nil)
 }
